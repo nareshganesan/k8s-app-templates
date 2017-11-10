@@ -21,11 +21,13 @@ force_create=0;
 if ( ! getopts "h:n:u:t" opt); then
 	usage "-u <user name is required>
     -n <node type is required>
-    -t (optional) cluster token" >&2;
+    -t (optional) cluster token
+    -i (optional) master ip address (host:port)
+    -d (optional) discovery token" >&2;
 	exit 1;
 fi
 
-while getopts "h:n:u:t" o; do
+while getopts "h:n:u:t:d:i:" o; do
     case "${o}" in
         u)
             user=${OPTARG}
@@ -36,13 +38,23 @@ while getopts "h:n:u:t" o; do
         t)
             token=${OPTARG}
             ;;
+	d)
+	    disc_token=${OPTARG}
+	    ;;
+	i)
+	    master_ip=${OPTARG}
+	    ;;
         h) usage "-u <user name is required> 
     -n <node type is required> 
-    -t (optional) cluster token" >&2;
+    -t (optional) cluster token
+    -i (optional) master ip address (host:port)
+    -d (optional) discovery token" >&2;
             exit 0;;
         \?) usage "-u <user name is required> 
     -n <node type is required> 
-    -t (optional) cluster token" >&2;
+    -t (optional) cluster token
+    -i (optional) master ip address (host:port)
+    -d (optional) discovery token" >&2;
             exit 1;;
         :)
             echo "Option -$OPTARG requires an argument." >&2
@@ -54,20 +66,15 @@ if [ ! "$user" ] || [ ! "$node_type" ]
 then
      usage "-u <user name is required> 
     -n <node type is required> 
-    -t (optional) cluster token" >&2;
+    -t (optional) cluster token
+    -i (optional) master ip address (host:port)
+    -d (optional) discovery token" >&2;
         exit 1;
 fi
 
 
-# echo "Root User: "$USER
-# echo "Home dir: "$HOME
-
-# su - $user -c 'echo  "User: "${USER}'
-# su - $user -c 'echo "Home dir: "${HOME}'
-
-
 if [ $node_type == "master" ]; then
-    echo "Kubernetes cluster setup: master"
+    echo "Kubernetes cluster: master setup"
     su - $user -c 'echo "User: "${USER}';
     kubeadm reset;
     kubeadm init --pod-network-cidr=10.244.0.0/16 | tee kubeadm_output.txt
@@ -91,15 +98,26 @@ if [ $node_type == "master" ]; then
     kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.0/Documentation/kube-flannel.yml
     exit 0;
 else
-   echo "Kubernetes cluster setup: node";
+   echo "Kubernetes cluster: node setup";
    if [ -z "$token" ]; then
        echo "cluster token is not set!";
        usage "-t (optional) cluster token" >&2;
        exit 1;
-   else
-       kubeadm reset;
-       kubeadm join --token $token;
-      exit 0;
    fi
+   if [ -z "$disc_token" ]; then
+       echo "discovery token is not set!";
+       usage "-d (optional) discovery token" >&2;
+       exit 1;
+   fi
+   if [ -z "$master_ip" ]; then
+       echo "master ip (host:port) is required cluster node setup"
+       usage "-i (optional) master ip address (host:port)"
+       exit 1;
+   fi
+   kubeadm reset;
+   echo "cluster token: "$token;
+   echo "discovery token: "$disc_token;
+   kubeadm join --token $token $master_ip --discovery-token-ca-cert-hash $disc_token;
+   exit 0;
 fi
 
