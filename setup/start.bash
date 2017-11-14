@@ -78,17 +78,12 @@ if [ $node_type == "master" ]; then
     su - $user -c 'echo "User: "${USER}';
     kubeadm reset;
     kubeadm init --pod-network-cidr=10.244.0.0/16 | tee kubeadm_output.txt
-    # cluster_token==$(grep -oP "\-\-token\K.*" kubeadm_output.txt)
     cluster_token=$(grep -oP '(?<=\-\-token).*(?=192)' kubeadm_output.txt)
     cluster_token=$(echo $cluster_token);
     discovery_token=$(grep -oP "\-\-discovery-token-ca-cert-hash\K.*" kubeadm_output.txt)
     discovery_token=$(echo $discovery_token);
     echo "token: "$cluster_token
     echo "discovery-token-ca-cert-hash: "$discovery_token
-    # if [ $? == 0 ]; then
-       # echo "\n";
-       # echo "discovery token ca-cert: "$?;
-    # fi;
     su - $user -c 'mkdir -p $HOME/.kube';
     su - $user -c 'echo "$HOME/.kube/config"' | xargs -i cp /etc/kubernetes/admin.conf {};
     su - $user -c 'chown $(id -u):$(id -g) $HOME/.kube/config';
@@ -99,6 +94,11 @@ if [ $node_type == "master" ]; then
     exit 0;
 else
    echo "Kubernetes cluster: node setup";
+   # To ensure hostname uniquesness
+   # TODO: need to way to generate node names
+   # vim /etc/hostname
+   # vim /etc/hosts
+   # hostnamectl set-hostname node1   
    if [ -z "$token" ]; then
        echo "cluster token is not set!";
        usage "-t (optional) cluster token" >&2;
