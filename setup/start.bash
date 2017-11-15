@@ -89,8 +89,23 @@ if [ $node_type == "master" ]; then
     su - $user -c 'chown $(id -u):$(id -g) $HOME/.kube/config';
     # Apply addons
 
-    # install flannel network config
-    kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.0/Documentation/kube-flannel.yml
+    # install necessary addons
+    # addon: flannel
+    kubectl create -f https://raw.githubusercontent.com/coreos/flannel/v0.9.0/Documentation/kube-flannel.yml
+    kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-rbac.yml
+
+    # addon: heapster
+    kubectl create -f https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/influxdb/influxdb.yaml
+    kubectl create -f https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/influxdb/grafana.yaml
+    kubectl create -f https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/influxdb/heapster.yaml
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/rbac/heapster-rbac.yaml
+
+    # TODO: addon: kube-lego - (auto https cert renewal using letsencrypt)
+    # ref: https://github.com/jetstack/kube-lego
+
+    # TODO: addon: dashboard - (has some issues with kubeadm > 1.8, )
+    # ref: https://github.com/kubernetes/dashboard
+
     exit 0;
 else
    echo "Kubernetes cluster: node setup";
