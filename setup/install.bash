@@ -39,19 +39,17 @@ resolvconf -u
 
 # Install Kubernetes Base
 
-# apt-get update && apt-get install -y apt-transport-https
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 touch /etc/apt/sources.list.d/kubernetes.list
-#bash -c 'echo "deb http://apt.kubernetes.io/ kubernetes-xenial-1.7 main" > /etc/apt/sources.list.d/kubernetes.list'
 bash -c 'echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list'
 apt-get update
 apt-get install -y --allow-unauthenticated kubelet=1.7.10-00 kubeadm=1.7.10-00 kubectl=1.7.10-00 kubernetes-cni=0.5.1-00
 
 # Note: apt-get -y install docker-engine
-# As of release Kubernetes 1.7.10, kubelet will not work with enabled swap.
-# https://github.com/kubernetes/kubernetes/issues/53333
+# As of release Kubernetes 1.7.10, kubelet does not have swap issue or flag.
+# https://github.com/kubernetes/kubernetes/issues/53333 - applies only to kubeadm >= v1.8
 # echo 'Environment="KUBELET_EXTRA_ARGS=--fail-swap-on=false --cgroup-driver=cgroupfs"' >> /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
-grep -n "Environment=" /etc/systemd/system/kubelet.service.d/10-kubeadm.conf | tail -n1 | cut -d: -f1 | xargs -I '{}' sed -i '{} a Environment="KUBELET_EXTRA_ARGS=--fail-swap-on=false --cgroup-driver=cgroupfs"' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+grep -n "Environment=" /etc/systemd/system/kubelet.service.d/10-kubeadm.conf | tail -n1 | cut -d: -f1 | xargs -I '{}' sed -i '{} a Environment="KUBELET_EXTRA_ARGS=--cgroup-driver=cgroupfs"' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
 systemctl daemon-reload
 systemctl restart kubelet
 
