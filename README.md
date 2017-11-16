@@ -4,7 +4,7 @@ I'm a newbie trying to make my way around Kubernetes, I've been learning and doc
 For kubernetes installation, I've been using either kubeadm or minikube for all the experiments.
 Please feel free to leave a comment or raise an issue here.
 
-> Note: All the scripts have been tested only on Ubuntu 16.04 (Xenial Xerus), Kubernetes v1.7.10, kubeadm v1.7.10.
+> Note: All the scripts have been tested only on Ubuntu 16.04 (Xenial Xerus), Kubernetes v1.8.1, kubeadm v1.8.1.
 
 ## Installation (Kubernetes-Ubuntu-Baremetal)
 
@@ -17,15 +17,13 @@ $ sudo bash setup/install.bash
 ## Setup
 To setup a kubernetes cluster:
 ```bash
-$ sudo bash start.bash -u username -n node_type
-# u - username of the application user to use kubectl
+$ sudo bash start.bash -n node_type
 # n - master / node
 # t (optional) - token to join an existing kubernetes cluster
 # i (optional) - master ip address (host:port) of cluster
 # d (optional) - discovery token to join the cluster
 ```
 
-> Note: discovery token has been made mandatory to join existing cluster starting from kubeadm > 1.7.
 
 ## Application development
 This is the most fun part of kubernetes, where we simply template the apps, deploy it inside containers, wrap it in service and expose it to outside world. 
@@ -38,12 +36,14 @@ Once we deploy an app as service, kubernetes takes care of the scaling, redundan
 To know more about the app templates, [see](https://github.com/nareshganesan/kubernetes-practice/tree/dev/apps)
 
 ## TODO
+- [ ] Kubernetes Dashboard
 - [ ] RBAC custom webhook authentication (Github Auth)
 - [ ] Custom Authorization for resource types 
 - [ ] Load balancer config automation
 - [ ] Custom cluster creation template (YAML's)
 - [ ] Auto backup configs, secrets, data to cloud object store. (S3, Cloud Storage, Azure Storage, Digital Ocean object storage)
 - [ ] CI
+- [ ] CPU / Memory monitoring (Heapster)
 
 ## TODO:app templates
 
