@@ -4,7 +4,7 @@ I'm a newbie trying to make my way around Kubernetes, I've been learning and doc
 For kubernetes installation, I've been using either kubeadm or minikube for all the experiments.
 Please feel free to leave a comment or raise an issue here.
 
-> Note: All the scripts have been tested only on Ubuntu 16.04 (Xenial Xerus).
+> Note: All the scripts have been tested only on Ubuntu 16.04 (Xenial Xerus), Kubernetes v1.7.10, kubeadm v1.7.10.
 
 ## Installation (Kubernetes-Ubuntu-Baremetal)
 
