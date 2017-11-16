@@ -1,8 +1,15 @@
-# Kubernetes practice 
+# Kubernetes practice ( :construction: WIP )
 
 I'm a newbie trying to make my way around Kubernetes, I've been learning and documenting the work. 
 For kubernetes installation, I've been using either kubeadm or minikube for all the experiments.
 Please feel free to leave a comment or raise an issue here.
+
+- [x] Dashboard
+- [x] Monitoring - Heapster
+- [ ] Ingress controller - nginx-ingress-controller / traefik ingress controller
+- [ ] Auto TLS provisioning - lets encrypt
+- [ ] Persistant volume - Rook
+
 
 > Note: All the scripts have been tested only on Ubuntu 16.04 (Xenial Xerus), Kubernetes v1.8.1, kubeadm v1.8.1.
 
