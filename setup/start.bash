@@ -22,12 +22,12 @@ if ( ! getopts "h:n:u:t" opt); then
 	usage "-u <user name is required>
     -n <node type is required>
     -t (optional) cluster token
-    -i (optional) master ip address (host:port)
-    -d (optional) discovery token" >&2;
+    -i (optional) master ip address (host:port)" >&2;
+    # -d (optional) discovery token" >&2;
 	exit 1;
 fi
 
-while getopts "h:n:u:t:d:i:" o; do
+while getopts "h:n:u:t:i:" o; do
     case "${o}" in
         u)
             user=${OPTARG}
@@ -38,23 +38,24 @@ while getopts "h:n:u:t:d:i:" o; do
         t)
             token=${OPTARG}
             ;;
-	d)
-	    disc_token=${OPTARG}
-	    ;;
+	# uncomment if kubeadm > v1.7
+        #d)
+	#    disc_token=${OPTARG}
+	#    ;;
 	i)
 	    master_ip=${OPTARG}
 	    ;;
         h) usage "-u <user name is required> 
     -n <node type is required> 
     -t (optional) cluster token
-    -i (optional) master ip address (host:port)
-    -d (optional) discovery token" >&2;
+    -i (optional) master ip address (host:port)" >&2;
+    #-d (optional) discovery token" >&2;
             exit 0;;
         \?) usage "-u <user name is required> 
     -n <node type is required> 
     -t (optional) cluster token
-    -i (optional) master ip address (host:port)
-    -d (optional) discovery token" >&2;
+    -i (optional) master ip address (host:port)" >&2;
+    #-d (optional) discovery token" >&2;
             exit 1;;
         :)
             echo "Option -$OPTARG requires an argument." >&2
@@ -67,8 +68,8 @@ then
      usage "-u <user name is required> 
     -n <node type is required> 
     -t (optional) cluster token
-    -i (optional) master ip address (host:port)
-    -d (optional) discovery token" >&2;
+    -i (optional) master ip address (host:port)" >&2;
+     # -d (optional) discovery token" >&2;
         exit 1;
 fi
 
@@ -80,10 +81,11 @@ if [ $node_type == "master" ]; then
     kubeadm init --pod-network-cidr=10.244.0.0/16 | tee kubeadm_output.txt
     cluster_token=$(grep -oP '(?<=\-\-token).*(?=192)' kubeadm_output.txt)
     cluster_token=$(echo $cluster_token);
-    discovery_token=$(grep -oP "\-\-discovery-token-ca-cert-hash\K.*" kubeadm_output.txt)
-    discovery_token=$(echo $discovery_token);
+    # uncomment if kubeadm > v1.7
+    # discovery_token=$(grep -oP "\-\-discovery-token-ca-cert-hash\K.*" kubeadm_output.txt)
+    # discovery_token=$(echo $discovery_token);
     echo "token: "$cluster_token
-    echo "discovery-token-ca-cert-hash: "$discovery_token
+    # echo "discovery-token-ca-cert-hash: "$discovery_token
     su - $user -c 'mkdir -p $HOME/.kube';
     su - $user -c 'echo "$HOME/.kube/config"' | xargs -i cp /etc/kubernetes/admin.conf {};
     su - $user -c 'chown $(id -u):$(id -g) $HOME/.kube/config';
@@ -119,11 +121,12 @@ else
        usage "-t (optional) cluster token" >&2;
        exit 1;
    fi
-   if [ -z "$disc_token" ]; then
-       echo "discovery token is not set!";
-       usage "-d (optional) discovery token" >&2;
-       exit 1;
-   fi
+   # uncomment if kubeadm > v1.7
+   # if [ -z "$disc_token" ]; then
+   #    echo "discovery token is not set!";
+   #    usage "-d (optional) discovery token" >&2;
+   #    exit 1;
+   #fi
    if [ -z "$master_ip" ]; then
        echo "master ip (host:port) is required cluster node setup"
        usage "-i (optional) master ip address (host:port)"
@@ -131,8 +134,10 @@ else
    fi
    kubeadm reset;
    echo "cluster token: "$token;
-   echo "discovery token: "$disc_token;
-   kubeadm join --token $token $master_ip --discovery-token-ca-cert-hash $disc_token;
+   # echo "discovery token: "$disc_token;
+   # discovery token only for kubeadm > v1.7
+   # kubeadm join --token $token $master_ip --discovery-token-ca-cert-hash $disc_token;
+   kubeadm join --token $token $master_ip
    exit 0;
 fi
 
