@@ -19,7 +19,7 @@ RUN apk add --no-cache bash git nginx \
     && rm -rf /var/cache/apk/*
 
 # expose server port
-EXPOSE 8000
+EXPOSE 80
 
 # create log directory
 RUN mkdir logs
