@@ -43,7 +43,7 @@ Once we deploy an app as service, kubernetes takes care of the scaling, redundan
 To know more about the app templates, [see](https://github.com/nareshganesan/kubernetes-practice/tree/dev/apps)
 
 ## TODO
-- [ ] Kubernetes Dashboard
+- [x] Kubernetes Dashboard
 - [ ] RBAC custom webhook authentication (Github Auth)
 - [ ] Custom Authorization for resource types 
 - [ ] Load balancer config automation
@@ -55,10 +55,10 @@ To know more about the app templates, [see](https://github.com/nareshganesan/kub
 ## TODO:app templates
 
 #### Servers 
-- [ ] nginx
+- [x] nginx
 - [ ] apache
 - [ ] tornado
-- [ ] uwsgi
+- [x] uwsgi
 
 #### static
 - [ ] Hugo
