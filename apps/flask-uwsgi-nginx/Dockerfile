@@ -19,8 +19,7 @@ RUN apk add --no-cache bash git nginx \
     && rm -rf /var/cache/apk/*
 
 # expose server port
-# only http and https for ssl
-EXPOSE 80 443
+EXPOSE 8000
 
 # create log directory
 RUN mkdir logs
@@ -37,6 +36,7 @@ RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 RUN rm /etc/supervisord.conf
 RUN ln -s supervisord/supervisord.conf /etc/
 
-ENTRYPOINT ["/tmp/docker-entrypoint.bash"]
+# Use the following script only if you need self signed ssl cert to be generated everytime
+# ENTRYPOINT ["/tmp/docker-entrypoint.bash"]
 
 CMD ["supervisord", "-c", "/tmp/supervisord/supervisord.conf", "-n"]

@@ -1,4 +1,5 @@
 import datetime
+import socket
 from flask import jsonify, request
 
 def resp_dict(status, msg, additional_msg=None):
@@ -13,6 +14,7 @@ def resp_dict(status, msg, additional_msg=None):
 def index():
     user = request.values.get("user", "anonymous") 
     app = "flask"
+    hostname = socket.gethostname()
     return jsonify(resp_dict("OK", 
-        "Greetings %s! \n This is a %s template bundled with uwsgi reverse proxied behind nginx." % (user, app), 
+        "Greetings %s! \n This is a %s template bundled with uwsgi reverse proxied behind nginx.(host: %s)" % (user, app, hostname), 
         {"code": 200}))
