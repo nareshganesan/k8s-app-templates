@@ -77,10 +77,18 @@ if [ $node_type == "master" ]; then
     kubeadm init --pod-network-cidr=10.244.0.0/16 | tee kubeadm_output.txt
     cluster_token=$(grep -oP '(?<=\-\-token).*(?=192)' kubeadm_output.txt)
     cluster_token=$(echo $cluster_token);
+    join_token=`sudo kubeadm token create --ttl 0 --description "custom join token never ending ttl"`;
     discovery_token=$(grep -oP "\-\-discovery-token-ca-cert-hash\K.*" kubeadm_output.txt)
     discovery_token=$(echo $discovery_token);
-    echo "token: "$cluster_token
+    tmp_data=$(grep -oP '(?<=\-\-token).*(?=discovery-token-ca-cert-hash)' kubeadm_output.txt | xargs)
+    tmp_data=($tmp_data)
+    master_ip="${tmp_data[1]}"
+    echo "cluster token: "$cluster_token
+    echo "join token: "$join_token
     echo "discovery-token-ca-cert-hash: "$discovery_token
+    echo "join nodes to the cluster using the following steps..."
+    echo "git clone https://github.com/nareshganesan/kubernetes-practice.git; cd kubernetes-practice/setup;"
+    echo "sudo bash start.bash -n node -t "$join_token" -i "$master_ip" -d "$discovery_token;
     su - $user -c 'mkdir -p $HOME/.kube';
     su - $user -c 'echo "$HOME/.kube/config"' | xargs -i cp /etc/kubernetes/admin.conf {};
     chown -R $user:$user $HOME/.kube/config;
@@ -131,8 +139,10 @@ else
        exit 1;
    fi
    kubeadm reset;
-   echo "cluster token: "$token;
+   echo "master ip: "$master_ip;
+   echo "cluster join token: "$token;
    echo "discovery token: "$disc_token;
+
    kubeadm join --token $token $master_ip --discovery-token-ca-cert-hash $disc_token;
    exit 0;
 fi
