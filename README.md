@@ -31,6 +31,12 @@ $ sudo bash start.bash -n node_type
 # d (optional) - discovery token to join the cluster
 ```
 
+> Note: (optional) If you want to schedule pods to master node.
+
+```bash
+# this will make kubernetes schedule pods on master node
+$ kubectl taint nodes --all node-role.kubernetes.io/master-
+```
 
 ## Application development
 This is the most fun part of kubernetes, where we simply template the apps, deploy it inside containers, wrap it in service and expose it to outside world. 
