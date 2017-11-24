@@ -51,6 +51,7 @@ metadata:
     app: flaskapp
     tier: rest-engine
 spec:
+  type: NodePort
   ports:
   - name: web
     port: 80
