@@ -9,7 +9,7 @@ COPY . .
 
 # basic flask environment
 RUN apk add --no-cache bash git nginx \
-    uwsgi uwsgi-python py2-pip \
+    uwsgi uwsgi-python py2-pip py-mysqldb \
     curl openssl supervisor \
     && chmod u+rx,g+rx,o+rx,a-w /tmp/docker-entrypoint.bash \
     && mkdir -p /opt/ssl \

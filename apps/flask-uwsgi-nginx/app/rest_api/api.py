@@ -18,3 +18,7 @@ def index():
     return jsonify(resp_dict("OK", 
         "Greetings %s! \n This is a %s template bundled with uwsgi reverse proxied behind nginx.(host: %s)" % (user, app, hostname), 
         {"code": 200}))
+
+def create_message():
+    message = request.values.get("msg", "")
+    
