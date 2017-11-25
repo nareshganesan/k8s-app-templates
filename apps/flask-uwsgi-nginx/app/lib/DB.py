@@ -33,33 +33,32 @@ class MySQL(DB):
         """  
         self.mysql_reference = arg
         self.db_url = db_url
-        self.greenie_pool = self._create_pool()
+        self.app_pool = self._create_pool()
         self.engine = self._create_engine()
         self.metadata = self._create_metadata()
         # get list of table names from a config
         self.tables = self._get_models()
-        logger.greenie_flask_logger().info(self.mysql_reference)
         return 
 
     def __str__(self): return self.mysql_reference
 
 
-    def _create_native_connection(self):
+    def _create_connection(self):
         url = make_url(self.db_url)
         conn = MySQLdb.connect(host=url.host,user=url.username,passwd=url.password,db=url.database)
         return conn
 
     def _create_pool(self):
-        greenie_pool = pool.QueuePool(
-                    self._create_native_connection,
+        tmp_pool = pool.QueuePool(
+                    self._create_connection,
                     max_overflow=10,
                     pool_size=15)
-        return greenie_pool
+        return tmp_pool
 
     def _create_engine(self):
         engine = create_engine(
                 self.db_url,  
-                pool = self.greenie_pool,
+                pool = self.app_pool,
                 echo=False,
                 connect_args = {
                     'pool_recycle': 300 # Should be less them MySQL WAIT_TIMEOUT
@@ -84,7 +83,82 @@ class MySQL(DB):
         tables = {}
         message = Table('message', self.metadata, autoload=True)
 
-        tables["message"] = users
+        tables["message"] = message
         return tables        
 
+    def fetchone(self, query, params=None):  
+        """ 
+        Fetchs one row 
+        """ 
+        data = None
+        print 'query: %s' % query
+        print 'params: %s' % str(params)
+        try:
+            cnx = self.app_pool.connect()
+            cnx.autocommit = True
+            cur = cnx.cursor()
+            query = MySQLdb.escape_string(query)
+            cur.execute(query, params if params else None)
+            data = cur.fetchone()
+            print data
+            cnx.commit()
+            cur.close()
+            cnx.close()  
+            return data
+        except MySQLdb.OperationalError as ex:  
+            print ex            
+            return data
 
+    def fetchall(self, query, params=None):  
+        """ 
+        Fetchs all the rows 
+        """ 
+        data = None
+        print 'query: %s' % query
+        print 'params: %s' % str(params)
+        try:
+            cnx = self.app_pool.connect()
+            cnx.autocommit = True
+            cur = cnx.cursor()
+            query = MySQLdb.escape_string(query)
+            cur.execute(query, params if params else None)
+            data = cur.fetchall()
+            count = cur.rowcount
+            print data
+            cnx.commit()
+            cur.close()
+            cnx.close()  
+            return {
+                "data" : data,
+                "count": count
+                }
+
+        except MySQLdb.OperationalError as ex: 
+            print ex            
+            return data
+
+    def execute(self, query, params=None):  
+        """ 
+        Executes query for create, insert, update, delete 
+        returns lastrowid of (autoincremented) INSERT or UPDATE statement or None when there is no such value available
+        """
+        data = None
+        print 'query: %s' % query
+        print 'params: %s' % str(params)
+        try:
+            cnx = self.app_pool.connect()
+            cur = cnx.cursor()
+            query = MySQLdb.escape_string(query)
+            cur.execute(query, params if params else None)
+            lastrowid = cur.lastrowid
+            print lastrowid
+            cnx.commit()
+            cur.close()
+            cnx.close()  
+            return {
+                "data" : data,
+                "lastrowid": lastrowid
+                }
+        except MySQLdb.OperationalError as ex:
+            print ex            
+            return data    
