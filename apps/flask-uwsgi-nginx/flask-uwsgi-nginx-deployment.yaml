@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: flask-uwsgi-nginx
-        image: flask-uwsgi-nginx:latest
+        image: nareshganesan/flask-uwsgi-nginx:v2.3
         resources:
           requests:
             cpu: 100m
