@@ -75,9 +75,9 @@ if [ $node_type == "master" ]; then
     echo "Kubernetes cluster: master setup"
     kubeadm reset;
     kubeadm init --pod-network-cidr=10.244.0.0/16 | tee kubeadm_output.txt
-    cluster_token=$(grep -oP '(?<=\-\-token).*(?=192)' kubeadm_output.txt)
+    cluster_token=$(grep -oP '(?<=\-\-token).*(?=\-\-disco)' kubeadm_output.txt)
     cluster_token=$(echo $cluster_token);
-    join_token=`sudo kubeadm token create --ttl 0 --description "custom join token never ending ttl"`;
+    # join_token=`sudo kubeadm token create --ttl 0 --description "custom join token never ending ttl"`;
     discovery_token=$(grep -oP "\-\-discovery-token-ca-cert-hash\K.*" kubeadm_output.txt)
     discovery_token=$(echo $discovery_token);
     tmp_data=$(grep -oP '(?<=\-\-token).*(?=discovery-token-ca-cert-hash)' kubeadm_output.txt | xargs)
@@ -107,15 +107,15 @@ if [ $node_type == "master" ]; then
 
     # addon: heapster
     # proxy url: http://localhost:8001/api/v1/namespaces/kube-system/services/monitoring-grafana/proxy
-    kubectl apply -f https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/influxdb/grafana.yaml
-    kubectl apply -f https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/influxdb/heapster.yaml
-    kubectl apply -f https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/influxdb/influxdb.yaml
-    kubectl apply -f https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/rbac/heapster-rbac.yaml
+    # kubectl apply -f https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/influxdb/grafana.yaml
+    # kubectl apply -f https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/influxdb/heapster.yaml
+    # kubectl apply -f https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/influxdb/influxdb.yaml
+    # kubectl apply -f https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/rbac/heapster-rbac.yaml
 
     # TODO: addon: kube-lego - (auto https cert renewal using letsencrypt)
     # ref: https://github.com/jetstack/kube-lego
 
-    exit 0;
+    exit -1;
 else
    echo "Kubernetes cluster: node setup";
    # To ensure hostname uniquesness
