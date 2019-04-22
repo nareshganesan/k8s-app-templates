@@ -1,4 +1,4 @@
-# Kubernetes practice ( :construction: WIP )
+# Kubernetes practice ( :construction: WIP ) .
 
 I'm a newbie trying to make my way around Kubernetes, I've been learning and documenting the work. 
 For kubernetes installation, I've been using either kubeadm or minikube for all the experiments.
